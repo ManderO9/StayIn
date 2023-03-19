@@ -7,8 +7,12 @@ namespace Stayin.Auth;
 /// </summary>
 public class DbConfiguration
 {
+    /// <summary>
+    /// Configures the different relationships and constrains on the entities stored in the database
+    /// </summary>
+    /// <param name="builder">The model builder to configure</param>
     public static void Configure(ModelBuilder builder)
     {
-
+        // TODO: configure database models and relationships
     }
 }
