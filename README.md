@@ -14,7 +14,7 @@
 ### then type
     dotnet run
 
-## If you don't have and SQL server database and you'd like to test the app
+## If you don't have an SQL server database and you'd like to test the app
     open the file: appsettings.json
     uncomment the line
     //"Default": "Data Source=.\\Database\\Stayin.db;"
