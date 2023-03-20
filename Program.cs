@@ -11,8 +11,8 @@ var app = builder.Build();
 
 
 // Add endpoints
-
-
+UserManagementEndpoints.AddEndpoints(app);
+AuthorizationEndpoints.AddEndpoints(app);
 app.MapGet("/", () => "Hello World!");
 
 

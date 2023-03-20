@@ -12,5 +12,6 @@ public class ApiRoutes
     public const string GetAllUsers = "/users/all";
     public const string GetUserById = "/users/byId/{id}";
     public const string GetUserByUsername = "/users/byUsername/{username}";
+    public const string Login = "/login";
 
 }

@@ -32,6 +32,13 @@ public static class ServiceConfigurationExtensions
             .AddDefaultTokenProviders();
 
 
+        // Add authentication using Jwt bearer tokens
+        services.AddAuthentication().AddJwtBearer(options =>
+        {
+            // Set token validation parameters
+            options.TokenValidationParameters = AuthenticationHelpers.GetValidationParameters(configuration);
+        });
+
         // Return the services for chaining
         return services;
     }
