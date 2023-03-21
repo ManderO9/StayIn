@@ -8,7 +8,7 @@ public class ApiResponse
     /// <summary>
     /// Whether the request was successful or failed
     /// </summary>
-    public bool Successful { get; set; }
+    public bool Successful => Errors == null || Errors.Count == 0;
 
     /// <summary>
     /// The errors to display to the user if the request failed

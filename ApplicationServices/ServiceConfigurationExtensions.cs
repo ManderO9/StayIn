@@ -31,6 +31,20 @@ public static class ServiceConfigurationExtensions
             // Add token providers for resettings passwords, changing emails, etc...
             .AddDefaultTokenProviders();
 
+        // Configure identity options
+        services.Configure<IdentityOptions>(options =>
+        {
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequireDigit = false;
+            options.Password.RequireLowercase = true;
+            options.Password.RequireUppercase = false;
+            options.Password.RequiredLength = 5;
+            options.Password.RequiredUniqueChars = 2;
+
+            options.User.RequireUniqueEmail = true;
+            options.Lockout.MaxFailedAccessAttempts = 5;
+        });
+
 
         // Add authentication using Jwt bearer tokens
         services.AddAuthentication().AddJwtBearer(options =>
