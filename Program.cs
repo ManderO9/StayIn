@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Stayin.Auth;
 
+
+
 // Create application builder
 var builder = WebApplication.CreateBuilder(args);
 

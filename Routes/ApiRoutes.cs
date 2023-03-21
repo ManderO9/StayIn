@@ -15,4 +15,5 @@ public class ApiRoutes
     public const string Login = "/login";
     public const string SignUp = "/signup";
 
+    public const string RequestAuthorization = "/requestAuthorization";
 }

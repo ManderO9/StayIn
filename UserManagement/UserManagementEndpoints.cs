@@ -33,7 +33,6 @@ public class UserManagementEndpoints
 
     }
 
-
     /// <summary>
     /// Handles login for users, makes sure the the passed in info is correct and returns a Jwt token if successful
     /// </summary>

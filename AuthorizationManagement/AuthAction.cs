@@ -5,7 +5,7 @@ public enum AuthAction
     /// <summary>
     /// Authorization was granted, proceed with the request action
     /// </summary>
-    Proceed,
+    Proceed = 0,
 
     /// <summary>
     /// Login is required, redirect to the login page
