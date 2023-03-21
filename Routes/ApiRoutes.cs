@@ -6,11 +6,10 @@
 public class ApiRoutes
 {
     // TODO: comment this stuff
-    public const string CreateUser = "/users/create";
-    public const string DeleteUser = "/users/delete/{id}";
-    public const string UpdateUser = "/users/update/{id}";
+    public const string DeleteUser = "/users/delete/{userId}";
+    public const string UpdateUser = "/users/update/{userId}";
     public const string GetAllUsers = "/users/all";
-    public const string GetUserById = "/users/byId/{id}";
+    public const string GetUserById = "/users/byId/{userId}";
     public const string GetUserByUsername = "/users/byUsername/{username}";
     public const string Login = "/login";
     public const string SignUp = "/signup";

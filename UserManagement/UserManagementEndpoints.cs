@@ -31,6 +31,9 @@ public class UserManagementEndpoints
         // Add sign up endpoint
         app.MapPost(ApiRoutes.SignUp, instance.SignUpHandler);
 
+        // Add user update endpoint
+        app.MapPost(ApiRoutes.UpdateUser, instance.UpdateUserHandler);
+
     }
 
     /// <summary>
@@ -152,7 +155,7 @@ public class UserManagementEndpoints
             return new ApiResponse<string>() { Errors = result.Errors.Select(x => x.Description).ToList() };
 
         // Add default roles of "landlord" and "renter" to this user
-        await userManager.AddToRolesAsync(user, new[] {ApplicationRoles.LandlordRole, ApplicationRoles.RenterRole});
+        await userManager.AddToRolesAsync(user, new[] { ApplicationRoles.LandlordRole, ApplicationRoles.RenterRole });
 
         // The user is valid and created successfully, now we try generate the token to return
 
@@ -179,6 +182,60 @@ public class UserManagementEndpoints
         return new ApiResponse<string>()
         {
             Body = new JwtSecurityTokenHandler().WriteToken(token),
+        };
+    }
+
+
+    /// <summary>
+    /// Handles updating user info
+    /// </summary>
+    /// <param name="userInfo">The info of the user to update</param>
+    /// <param name="userId">The id of the user to update</param>
+    /// <param name="userManager">The user manager to handle user updating</param>
+    /// <returns>An <see cref="ApiResponse"/> with the new user info in it's body if successful, or errors if failed</returns>
+    public async Task<ApiResponse<UserUpdateModel>> UpdateUserHandler([FromBody] UserUpdateModel userInfo, string userId, UserManager<ApplicationUser> userManager)
+    {
+        // Try get the user using it's id
+        var user = await userManager.FindByIdAsync(userId);
+
+        // If it doesn't exist
+        if(user is null)
+            // Return an error
+            return new ApiResponse<UserUpdateModel>()
+            {
+                Errors = new List<string>()
+                {
+                    "The user that you want to update does not exit"
+                }
+            };
+
+        // If the username is not empty
+        if(!string.IsNullOrEmpty(userInfo.Username))
+            // Update it
+            user.UserName = userInfo.Username;
+
+        // If the phone number is not empty
+        if(!string.IsNullOrEmpty(userInfo.PhoneNumber))
+            // Update it
+            user.PhoneNumber = userInfo.PhoneNumber;
+
+        // If the email is not empty
+        if(!string.IsNullOrEmpty(userInfo.Email))
+            // Update it
+            user.Email = userInfo.Email;
+
+        // Try save the changes 
+        var result = await userManager.UpdateAsync(user);
+
+        // If the update was successful
+        if(result.Succeeded)
+            // Return a success response containing the user
+            return new ApiResponse<UserUpdateModel>() { Body = userInfo };
+
+        // Otherwise, return an error
+        return new ApiResponse<UserUpdateModel>()
+        {
+            Errors = result.Errors.Select(x => x.Description).ToList()
         };
     }
 

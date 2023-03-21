@@ -85,6 +85,45 @@ public class AuthorizationEndpoints
 
                 // If he is an admin, he can get all users, otherwise, he will get rejected 
                 return (true, isAdmin ? AuthAction.Proceed : AuthAction.AccessDenied);
+            },
+           
+            // Update user
+            async (authRequest, provider) => {
+                // Try match the request path with the update user route
+                var pathMatchResult = Match(authRequest.Path, ApiRoutes.UpdateUser);
+
+                // If the route does not match
+                if(!pathMatchResult.matched)
+                    // Return false, indicating that we did not handle this request
+                    return (false, default(AuthAction));
+
+                // Try authenticate the token and get the user claims
+                var userClaims = AuthenticationHelpers.AuthenticateJwtToken(authRequest.Token, provider.GetRequiredService<IConfiguration>());
+
+                // If the user claims are null, the token is invalid
+                if(userClaims is null)
+                    // Return login action to the caller
+                    return (true, AuthAction.Login);
+
+                // Get the user manager
+                var userManager = provider.GetRequiredService<UserManager<ApplicationUser>>();
+                
+                // Get the user requesting the update
+                var user = await userManager.FindByNameAsync(Username(userClaims));
+
+                // Check if the user has an admin role
+                var isAdmin = await userManager.IsInRoleAsync(user!, ApplicationRoles.AdminRole);
+
+                // If he is an admin, he can update the user
+                if (isAdmin) return (true, AuthAction.Proceed );
+                
+                // Otherwise, if the user has the same id as the user he is requesting to update
+                if(user!.Id == pathMatchResult.pathParams!.First(x=>x.paramName == "userId").value)
+                    // Return success
+                    return (true, AuthAction.Proceed);
+
+                // Otherwise, return an authorized response
+                return (true, AuthAction.AccessDenied);
             }
         };
     }
@@ -131,12 +170,12 @@ public class AuthorizationEndpoints
         // For each authentication handler 
         foreach(var handler in mAuthHandlers)
         {
-            // Get the result of running the handle method
+            // Get the pathMatchResult of running the handle method
             var result = await handler(authRequest, provider);
 
             // If the request has been handled...
             if(result.handled)
-                // Return the result that we got from the handler
+                // Return the pathMatchResult that we got from the handler
                 return new ApiResponse<AuthResponse>() { Body = new() { Action = result.action } };
         }
 
