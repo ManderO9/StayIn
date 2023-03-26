@@ -185,7 +185,6 @@ public class UserManagementEndpoints
         };
     }
 
-
     /// <summary>
     /// Handles updating user info
     /// </summary>
@@ -201,13 +200,7 @@ public class UserManagementEndpoints
         // If it doesn't exist
         if(user is null)
             // Return an error
-            return new ApiResponse<UserUpdateModel>()
-            {
-                Errors = new List<string>()
-                {
-                    "The user that you want to update does not exit"
-                }
-            };
+            return new() { Errors = new() { "The user that you want to update does not exit" } };
 
         // If the username is not empty
         if(!string.IsNullOrEmpty(userInfo.Username))
@@ -230,13 +223,10 @@ public class UserManagementEndpoints
         // If the update was successful
         if(result.Succeeded)
             // Return a success response containing the user
-            return new ApiResponse<UserUpdateModel>() { Body = userInfo };
+            return new() { Body = userInfo };
 
         // Otherwise, return an error
-        return new ApiResponse<UserUpdateModel>()
-        {
-            Errors = result.Errors.Select(x => x.Description).ToList()
-        };
+        return new() { Errors = result.Errors.Select(x => x.Description).ToList() };
     }
 
     #endregion

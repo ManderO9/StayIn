@@ -28,7 +28,7 @@ public static class ServiceConfigurationExtensions
             // Set the persistent data store used by the identity system
             .AddEntityFrameworkStores<ApplicationDbContext>()
 
-            // Add token providers for resettings passwords, changing emails, etc...
+            // Add token providers for resetting passwords, changing emails, etc...
             .AddDefaultTokenProviders();
 
         // Configure identity options

@@ -61,7 +61,7 @@ public class AuthorizationEndpoints
 
             // Get all users route
             async (authRequest, provider) => {
-                // Try match the request path with the sign up route
+                // Try match the request path with the get all users route
                 var result = Match(authRequest.Path, ApiRoutes.GetAllUsers);
 
                 // If the route does not match
@@ -170,15 +170,16 @@ public class AuthorizationEndpoints
         // For each authentication handler 
         foreach(var handler in mAuthHandlers)
         {
-            // Get the pathMatchResult of running the handle method
+            // Get the result of running the handle method
             var result = await handler(authRequest, provider);
 
             // If the request has been handled...
             if(result.handled)
-                // Return the pathMatchResult that we got from the handler
+                // Return the action result that we got from the handler
                 return new ApiResponse<AuthResponse>() { Body = new() { Action = result.action } };
         }
 
+        // If no previous handler matched the request route
         // Return not found action, meaning there was no resource/handler for the requested resource
         return new ApiResponse<AuthResponse>() { Body = new() { Action = AuthAction.NotFound } };
     }
