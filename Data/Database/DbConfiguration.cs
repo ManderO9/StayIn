@@ -13,6 +13,8 @@ public class DbConfiguration
     /// <param name="builder">The model builder to configure</param>
     public static void Configure(ModelBuilder builder)
     {
+        builder.Entity<BaseEvent>().HasKey(x => x.EventId);
+
         // TODO: configure database models and relationships
     }
 }

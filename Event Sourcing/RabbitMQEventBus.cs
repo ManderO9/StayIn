@@ -1,15 +1,16 @@
-﻿using RabbitMQ.Client;
+﻿using Microsoft.EntityFrameworkCore;
+using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Stayin.Auth;
 
 public class RabbitMQEventBus
 {
     #region Private Members
-
 
     private const string mQueueName = "DefaultQueue";
 
@@ -29,7 +30,6 @@ public class RabbitMQEventBus
     /// Message consumer
     /// </summary>
     EventingBasicConsumer? mConsumer;
-
 
     #endregion
 
@@ -72,7 +72,7 @@ public class RabbitMQEventBus
     }
 
 
-    public Task StartConsuming(EventHandler<BasicDeliverEventArgs> handle)
+    public Task StartConsuming(Func<BasicDeliverEventArgs, Task> handle)
     {
         // Create the connection factory
         var factory = new ConnectionFactory() { HostName = mHostName };
@@ -90,10 +90,17 @@ public class RabbitMQEventBus
         mConsumer = new EventingBasicConsumer(mChannel);
 
         // Set the method that handles new messages
-        mConsumer.Received += handle;
+        mConsumer.Received +=  async (sender, eventArgs) =>
+        {
+            // Handle the message
+            await handle(eventArgs);
+
+            // Negative acknowledge the message so it doesn't get deleted from the message store
+            mChannel.BasicNack(eventArgs.DeliveryTag, false, true);
+        };
 
         // Start consuming
-        mChannel.BasicConsume(mQueueName, false, mConsumer);
+        mChannel.BasicConsume(mConsumer, mQueueName);
 
         return Task.CompletedTask;
     }

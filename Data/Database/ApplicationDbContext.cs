@@ -42,6 +42,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
     /// </summary>
     public DbSet<Message> Messages { get; set; }
 
+    /// <summary>
+    /// A table that will contain all the events that have been consumed by our application
+    /// </summary>
+    public DbSet<BaseEvent> ConsumedEvents { get; set; }
+
     #endregion
 
     #region Constructor
