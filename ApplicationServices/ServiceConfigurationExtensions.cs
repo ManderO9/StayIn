@@ -53,6 +53,14 @@ public static class ServiceConfigurationExtensions
             options.TokenValidationParameters = AuthenticationHelpers.GetValidationParameters(configuration);
         });
 
+        // Add queue consumer service
+        services.AddHostedService<QueueConsumerService>();
+
+        // Add RabbitMQ event bus
+        services.AddTransient<IEventBus, RabbitMQEventBus>(provider => new RabbitMQEventBus(
+                provider.GetRequiredService<IConfiguration>()["RabbitMQ:Queue"]!,
+                provider.GetRequiredService<IConfiguration>()["RabbitMQ:Uri"]!));
+
         // Return the services for chaining
         return services;
     }

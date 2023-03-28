@@ -1,10 +1,8 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.AspNetCore.Identity;
 using Stayin.Auth;
-using System.Text;
-using System.Text.Json;
 using System.Diagnostics;
-using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 
 
@@ -50,11 +48,12 @@ app.Map("/", () => "hello world!");
 
 
 
-app.MapGet("/createMessage", () =>
+
+
+
+
+app.Map("/create", (IEventBus eventBus) =>
 {
-
-    var eventBus = new RabbitMQEventBus();
-
     var message = new UserCreatedEvent()
     {
         EventId = Guid.NewGuid().ToString("N"),
@@ -63,62 +62,43 @@ app.MapGet("/createMessage", () =>
     };
     eventBus.Publish(message);
 
-    return message;
+    var otherMessage = new UserDeletedEvent()
+    {
+        EventId = Guid.NewGuid().ToString("N"),
+        PublishedTime = DateTimeOffset.UtcNow,
+        UserId = Guid.NewGuid().ToString("N"),
+    };
+    eventBus.Publish(otherMessage);
+
+    return (message, otherMessage);
 });
 
-app.MapGet("/getMessages", async (ApplicationDbContext mDbContext) =>
+app.Map("/get", async (HttpContext context) =>
 {
-    var a = new RabbitMQEventBus();
-    var output = "";
-    var lockObj = new object();
+    var messages = await context.RequestServices.GetRequiredService<IEventBus>().GetAllMessages();
 
-    var closed = false;
+    var newMessages = new List<string>();
 
-    await a.StartConsuming(
-        async (eventArgs) =>
+    messages.ForEach(message =>
+    {
+        switch(message.messageType)
         {
-            if(closed)
-            
-                return;
+            case nameof(UserCreatedEvent):
+                newMessages.Add(JsonSerializer.Serialize(JsonSerializer.Deserialize<UserCreatedEvent>(message.message.Span)));
+                break;
 
-            // Convert the message to base event
-            var baseEvent = JsonSerializer.Deserialize<BaseEvent>(eventArgs.Body.Span)!;
+            case nameof(UserDeletedEvent):
+                newMessages.Add(JsonSerializer.Serialize(JsonSerializer.Deserialize<UserDeletedEvent>(message.message.Span)));
+                break;
 
-            lock(lockObj)
-            {
-                // Check that the message has not been handled before
-                var handled = mDbContext.ConsumedEvents.Any(x => x.EventId == baseEvent.EventId);
+            default:
+                Debugger.Break();
+                throw new NotImplementedException();
 
-                // If it wasn't
-                if(!handled)
-                {
-                    // Add it to the list of handled messages
-                    mDbContext.ConsumedEvents.Add(baseEvent);
-                    mDbContext.SaveChanges();
+        }
+    });
 
-                    // Switch the type of the event
-                    switch(eventArgs.BasicProperties.Type)
-                    {
-                        case nameof(UserCreatedEvent):
-                            var newEvent = JsonSerializer.Deserialize<UserCreatedEvent>(eventArgs.Body.Span);
-                            output += "Event Id: " + newEvent?.EventId + Environment.NewLine;
-                            break;
-
-                        default:
-                            Debugger.Break();
-                            throw new NotImplementedException();
-
-                    }
-                }
-            }
-        });
-
-    await Task.Delay(5000);
-
-    closed = true;
-    await a.StopConsuming();
-
-    return output;
+    return newMessages;
 });
 
 
