@@ -5,7 +5,7 @@ using System.Text.Json;
 namespace Stayin.Auth;
 
 /// <summary>
-/// RabbitMQ implementation of and event bus 
+/// RabbitMQ implementation of an event bus 
 /// </summary>
 public class RabbitMQEventBus : IEventBus
 {

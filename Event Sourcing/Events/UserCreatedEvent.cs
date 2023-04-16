@@ -6,7 +6,7 @@ public class UserCreatedEvent : BaseEvent
 
     public Task Handle(ApplicationDbContext db)
     {
-        Console.WriteLine("User created: Id: " + UserId);
+        Console.WriteLine($"User created: userId:{UserId}, eventId: {EventId}, event created date: {PublishedTime}");
         return Task.CompletedTask;
     }
 }

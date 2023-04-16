@@ -3,6 +3,9 @@ using System.Text.Json;
 
 namespace Stayin.Auth;
 
+/// <summary>
+/// Background service for consuming new events from the event bus
+/// </summary>
 public class QueueConsumerService : BackgroundService
 {
     #region Private Members
@@ -20,7 +23,7 @@ public class QueueConsumerService : BackgroundService
     /// Default constructor
     /// </summary>
     /// <param name="serviceScopeFactory">Factory for creating scopes for scoped services</param>
-    public QueueConsumerService(IEventBus eventBus, IServiceScopeFactory serviceScopeFactory)
+    public QueueConsumerService(IServiceScopeFactory serviceScopeFactory)
     {
         mServiceScopeFactory = serviceScopeFactory;
     }

@@ -6,8 +6,7 @@ public class UserDeletedEvent : BaseEvent
 
     public Task Handle(ApplicationDbContext db)
     {
-        Console.WriteLine("User has been delted");
-        Console.WriteLine("Id: " + UserId);
+        Console.WriteLine($"User deleted: userId:{UserId}, eventId: {EventId}, event created date: {PublishedTime}");
         return Task.CompletedTask;
     }
 }
