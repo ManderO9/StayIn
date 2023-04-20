@@ -13,7 +13,7 @@ public static class ServiceConfigurationExtensions
     /// </summary>
     /// <param name="services">The DI container to add the services to</param>
     /// <returns></returns>
-    public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
         // Add database context
         services.AddDbContext<ApplicationDbContext>(options =>
@@ -21,6 +21,9 @@ public static class ServiceConfigurationExtensions
             // Use SQL server as backend database
             options.UseSqlServer(configuration.GetConnectionString("Default"));
         });
+
+        // Add data access service
+        services.AddScoped<IDataAccess, DataAccess>();
 
         // Add identity service to the application
         services.AddIdentity<ApplicationUser, ApplicationRole>()

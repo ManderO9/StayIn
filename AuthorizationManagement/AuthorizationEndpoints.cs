@@ -176,12 +176,12 @@ public class AuthorizationEndpoints
             // If the request has been handled...
             if(result.handled)
                 // Return the action result that we got from the handler
-                return new ApiResponse<AuthResponse>() { Body = new() { Action = result.action } };
+                return new() { Body = new() { Action = result.action } };
         }
 
         // If no previous handler matched the request route
         // Return not found action, meaning there was no resource/handler for the requested resource
-        return new ApiResponse<AuthResponse>() { Body = new() { Action = AuthAction.NotFound } };
+        return new() { Body = new() { Action = AuthAction.NotFound } };
     }
 
     #endregion

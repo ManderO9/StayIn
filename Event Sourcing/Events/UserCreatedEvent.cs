@@ -10,6 +10,7 @@ public class UserCreatedEvent : BaseEvent
     /// <inheritdoc/>
     public override Task Handle(IDataAccess dataAccess)
     {
+        Console.WriteLine($"{nameof(UserCreatedEvent)}: {EventId}" );
         // Ignore this event
         return Task.CompletedTask;
     }

@@ -110,10 +110,8 @@ public class RabbitMQEventBus : IEventBus
             {
                 // If the event has not been handled yet
                 if(await dataAccess.AddToConsumedEventsIfNotAlreadyAsync(message.BasicProperties.MessageId))
-                {
                     // Add the message to the list of messages to return
                     messages.Add(GetEventFromBytes(message.Body, message.BasicProperties.Type));
-                }
 
                 // Set the current message tag as the last one received
                 lastDeliveryTag = message.DeliveryTag;

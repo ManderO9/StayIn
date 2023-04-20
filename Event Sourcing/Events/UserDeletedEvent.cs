@@ -7,6 +7,7 @@ public class UserDeletedEvent : BaseEvent
     /// <inheritdoc/>
     public override Task Handle(IDataAccess dataAccess)
     {
+        Console.WriteLine($"{nameof(UserDeletedEvent)}: {EventId}" );
         // Ignore this event
         return Task.CompletedTask;
     }

@@ -74,6 +74,10 @@ app.Map("/get", async (HttpContext context, IDataAccess db) =>
     return await context.RequestServices.GetRequiredService<IEventBus>().GetNewEvents(db);
 });
 
+app.Map("/getall", async (HttpContext context, IDataAccess db) =>
+{
+    return await context.RequestServices.GetRequiredService<IEventBus>().GetAllEvents();
+});
 
 
 
