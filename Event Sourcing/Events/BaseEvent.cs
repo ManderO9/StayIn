@@ -14,4 +14,12 @@ public class BaseEvent
     /// The time at which this event was created and published
     /// </summary>
     public required DateTimeOffset PublishedTime { get; set; }
+
+    /// <summary>
+    /// Handles an event and stores adequate data in the data store
+    /// </summary>
+    /// <param name="dataAccess">The data access service</param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException">Throw if we haven't overridden the method in a sub class</exception>
+    public virtual Task Handle(IDataAccess dataAccess) => throw new NotImplementedException();
 }

@@ -1,10 +1,6 @@
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
 using Stayin.Auth;
-using System.Diagnostics;
-using System.Text.Json;
-
-
 
 // Create application builder
 var builder = WebApplication.CreateBuilder(args);
@@ -34,7 +30,7 @@ builder.Services.Configure<JsonOptions>(config =>
 });
 
 // Add application services
-builder.Services.AddServices(builder.Configuration);
+builder.Services.AddApplicationServices(builder.Configuration);
 
 // Build the application
 var app = builder.Build();
@@ -73,32 +69,9 @@ app.Map("/create", (IEventBus eventBus) =>
     return (message, otherMessage);
 });
 
-app.Map("/get", async (HttpContext context) =>
+app.Map("/get", async (HttpContext context, IDataAccess db) =>
 {
-    var messages = await context.RequestServices.GetRequiredService<IEventBus>().GetAllMessages();
-
-    var newMessages = new List<string>();
-
-    messages.ForEach(message =>
-    {
-        switch(message.messageType)
-        {
-            case nameof(UserCreatedEvent):
-                newMessages.Add(JsonSerializer.Serialize(JsonSerializer.Deserialize<UserCreatedEvent>(message.message.Span)));
-                break;
-
-            case nameof(UserDeletedEvent):
-                newMessages.Add(JsonSerializer.Serialize(JsonSerializer.Deserialize<UserDeletedEvent>(message.message.Span)));
-                break;
-
-            default:
-                Debugger.Break();
-                throw new NotImplementedException();
-
-        }
-    });
-
-    return newMessages;
+    return await context.RequestServices.GetRequiredService<IEventBus>().GetNewEvents(db);
 });
 
 
@@ -108,7 +81,7 @@ app.Map("/get", async (HttpContext context) =>
 
 // Make sure that the database exists
 using var scope = app.Services.CreateScope();
-var newlyCreated = await scope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.EnsureCreatedAsync();
+var newlyCreated = await scope.ServiceProvider.GetRequiredService<IDataAccess>().EnsureCreatedAsync();
 
 // If we have newly created eventBus database 
 if(newlyCreated)

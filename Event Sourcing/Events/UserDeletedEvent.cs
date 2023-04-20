@@ -4,9 +4,10 @@ public class UserDeletedEvent : BaseEvent
 {
     public required string UserId { get; set; }
 
-    public Task Handle(ApplicationDbContext db)
+    /// <inheritdoc/>
+    public override Task Handle(IDataAccess dataAccess)
     {
-        Console.WriteLine($"User deleted: userId:{UserId}, eventId: {EventId}, event created date: {PublishedTime}");
+        // Ignore this event
         return Task.CompletedTask;
     }
 }
