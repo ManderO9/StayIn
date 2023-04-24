@@ -62,7 +62,8 @@ public static class ServiceConfigurationExtensions
         // Add RabbitMQ event bus
         services.AddTransient<IEventBus, RabbitMQEventBus>(provider => new RabbitMQEventBus(
                 provider.GetRequiredService<IConfiguration>()["RabbitMQ:Queue"]!,
-                provider.GetRequiredService<IConfiguration>()["RabbitMQ:Uri"]!));
+                provider.GetRequiredService<IConfiguration>()["RabbitMQ:Uri"]!,
+                provider.GetRequiredService<ILogger<RabbitMQEventBus>>()));
 
         // Return the services for chaining
         return services;

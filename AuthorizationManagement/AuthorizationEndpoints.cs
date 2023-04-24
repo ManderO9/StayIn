@@ -125,7 +125,7 @@ public class AuthorizationEndpoints
                 return (true, AuthAction.AccessDenied);
             },
            
-            // Get user details
+            // Get user details by id
             (authRequest, provider) => {
                 // Try match the request path with the get user by id route
                 var pathMatchResult = Match(authRequest.Path, ApiRoutes.GetUserById);

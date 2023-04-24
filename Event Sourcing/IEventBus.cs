@@ -9,6 +9,9 @@ public interface IEventBus
     /// Returns the list of all events available in the event store
     /// </summary>
     /// <returns></returns>
+    /// /// <remarks>
+    /// If the operation fails for some reason an empty list is returned and an error is logged
+    /// </remarks>
     Task<List<BaseEvent>> GetAllEvents();
 
     /// <summary>
@@ -16,6 +19,9 @@ public interface IEventBus
     /// </summary>
     /// <param name="dataAccess">The data access service</param>
     /// <returns></returns>
+    /// /// <remarks>
+    /// If the operation fails for some reason an empty list is returned and an error is logged
+    /// </remarks>
     Task<List<BaseEvent>> GetNewEvents(IDataAccess dataAccess);
 
 
@@ -24,7 +30,7 @@ public interface IEventBus
     /// </summary>
     /// <typeparam name="T">The type of the event to publish</typeparam>
     /// <param name="message">The event to publish</param>
-    /// <returns></returns>
-    Task Publish<T>(T message) where T : BaseEvent;
+    /// <returns>A <see cref="Task"/> containing <see langword="true"/> if we successfully published the message or <see langword="false"/> if not</returns>
+    Task<bool> Publish<T>(T message) where T : BaseEvent;
 
 }

@@ -1,16 +1,19 @@
 ﻿namespace Stayin.Auth;
 
-/// <summary>
-/// The event that will get published when a user got created
-/// </summary>
-public class UserCreatedEvent : BaseEvent
+public class UserDeletedEvent : BaseEvent
 {
+    #region Public Properties
+
+    /// <summary>
+    /// The id of the deleted user
+    /// </summary>
     public required string UserId { get; set; }
+
+    #endregion
 
     /// <inheritdoc/>
     public override Task Handle(IDataAccess dataAccess)
     {
-        Console.WriteLine($"{nameof(UserCreatedEvent)}: {EventId}" );
         // Ignore this event
         return Task.CompletedTask;
     }

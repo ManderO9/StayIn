@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
-using RabbitMQ.Client;
+﻿using RabbitMQ.Client;
+using RabbitMQ.Client.Exceptions;
 using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
@@ -23,6 +23,11 @@ public class RabbitMQEventBus : IEventBus
     /// </summary>
     private string mUri;
 
+    /// <summary>
+    /// Logger to log messages
+    /// </summary>
+    private readonly ILogger<RabbitMQEventBus> mLogger;
+
     #endregion
 
     #region Constructor
@@ -32,10 +37,11 @@ public class RabbitMQEventBus : IEventBus
     /// </summary>
     /// <param name="queueName">The name of the queue to get messages from</param>
     /// <param name="uri">The URI to the RabbitMQ server to get messages from</param>
-    public RabbitMQEventBus(string queueName, string uri)
+    public RabbitMQEventBus(string queueName, string uri, ILogger<RabbitMQEventBus> logger)
     {
         mQueueName = queueName;
         mUri = uri;
+        mLogger = logger;
     }
 
     #endregion
@@ -57,6 +63,7 @@ public class RabbitMQEventBus : IEventBus
         var availableEvents = new List<(string typeName, Type type)>() {
             (nameof(UserCreatedEvent), typeof(UserCreatedEvent)),
             (nameof(UserDeletedEvent), typeof(UserDeletedEvent)),
+            (nameof(UserUpdatedEvent), typeof(UserUpdatedEvent))
         };
 
         // For each event in the available events
@@ -84,47 +91,59 @@ public class RabbitMQEventBus : IEventBus
         // Create the connection factory with the given URI
         var factory = new ConnectionFactory() { Uri = new Uri(mUri) };
 
-        // Create a connection to the server
-        using var connection = factory.CreateConnection();
-
-        // Create a channel for communication
-        using var channel = connection.CreateModel();
-
-        // Create the list of messages to return
-        var messages = new List<BaseEvent>();
-
-        // The message to get in each request
-        BasicGetResult? message = null;
-
-        // The tag of the last delivered message so we can acknowledge them
-        ulong lastDeliveryTag = 0;
-
-        // Loop
-        do
+        try
         {
-            // Get a message
-            message = channel.BasicGet(mQueueName, false);
+            // Create a connection to the server
+            using var connection = factory.CreateConnection();
 
-            // If the message is not null
-            if(message != null)
+            // Create a channel for communication
+            using var channel = connection.CreateModel();
+
+            // Create the list of messages to return
+            var messages = new List<BaseEvent>();
+
+            // The message to get in each request
+            BasicGetResult? message = null;
+
+            // The tag of the last delivered message so we can acknowledge them
+            ulong lastDeliveryTag = 0;
+
+            // Loop
+            do
             {
-                // If the event has not been handled yet
-                if(await dataAccess.AddToConsumedEventsIfNotAlreadyAsync(message.BasicProperties.MessageId))
-                    // Add the message to the list of messages to return
-                    messages.Add(GetEventFromBytes(message.Body, message.BasicProperties.Type));
+                // Get a message
+                message = channel.BasicGet(mQueueName, false);
 
-                // Set the current message tag as the last one received
-                lastDeliveryTag = message.DeliveryTag;
-            }
+                // If the message is not null
+                if(message != null)
+                {
+                    // If the event has not been handled yet
+                    if(await dataAccess.AddToConsumedEventsIfNotAlreadyAsync(message.BasicProperties.MessageId))
+                        // Add the message to the list of messages to return
+                        messages.Add(GetEventFromBytes(message.Body, message.BasicProperties.Type));
 
-            // Until we have a message that is null
-        } while(message != null);
+                    // Set the current message tag as the last one received
+                    lastDeliveryTag = message.DeliveryTag;
+                }
 
-        // Acknowledge all the received messages
-        channel.BasicNack(lastDeliveryTag, true, true);
+                // Until we have a message that is null
+            } while(message != null);
 
-        // Return the messages
-        return messages;
+            // Acknowledge all the received messages
+            channel.BasicNack(lastDeliveryTag, true, true);
+
+            // Return the messages
+            return messages;
+        }
+        catch(BrokerUnreachableException brokerUnreachableException)
+        {
+            // Log it
+            mLogger.LogError(brokerUnreachableException, "Failed to get new events");
+
+            // Return empty list
+            return new();
+        }
+
     }
 
     /// <inheritdoc/>
@@ -133,88 +152,109 @@ public class RabbitMQEventBus : IEventBus
         // Create the connection factory with the given URI
         var factory = new ConnectionFactory() { Uri = new Uri(mUri) };
 
-        // Create a connection to the server
-        using var connection = factory.CreateConnection();
-
-        // Create a channel for communication
-        using var channel = connection.CreateModel();
-
-        // Create the list of messages to return
-        var messages = new List<BaseEvent>();
-
-        // The message to get in each request
-        BasicGetResult? message = null;
-
-        // The tag of the last delivered message so we can acknowledge them
-        ulong lastDeliveryTag = 0;
-        
-        // Loop
-        do
+        try
         {
-            // Get a message
-            message = channel.BasicGet(mQueueName, false);
+            // Create a connection to the server
+            using var connection = factory.CreateConnection();
 
-            // If the message is not null
-            if(message != null)
+            // Create a channel for communication
+            using var channel = connection.CreateModel();
+
+            // Create the list of messages to return
+            var messages = new List<BaseEvent>();
+
+            // The message to get in each request
+            BasicGetResult? message = null;
+
+            // The tag of the last delivered message so we can acknowledge them
+            ulong lastDeliveryTag = 0;
+
+            // Loop
+            do
             {
-                // Add the message to the list of messages to return
-                messages.Add(GetEventFromBytes(message.Body, message.BasicProperties.Type));
+                // Get a message
+                message = channel.BasicGet(mQueueName, false);
 
-                // Set the current message tag as the last one received
-                lastDeliveryTag = message.DeliveryTag;
-            }
+                // If the message is not null
+                if(message != null)
+                {
+                    // Add the message to the list of messages to return
+                    messages.Add(GetEventFromBytes(message.Body, message.BasicProperties.Type));
 
-            // Until we have a message that is null
-        } while(message != null);
+                    // Set the current message tag as the last one received
+                    lastDeliveryTag = message.DeliveryTag;
+                }
 
-        // Acknowledge all the received messages
-        channel.BasicNack(lastDeliveryTag, true, true);
+                // Until we have a message that is null
+            } while(message != null);
 
-        // Return the messages
-        return Task.FromResult(messages);
+            // Acknowledge all the received messages
+            channel.BasicNack(lastDeliveryTag, true, true);
+
+            // Return the messages
+            return Task.FromResult(messages);
+
+        }
+        catch(BrokerUnreachableException brokerUnreachableException)
+        {
+            // Log it
+            mLogger.LogError(brokerUnreachableException, "Failed to get all events");
+
+            // Return empty list
+            return Task.FromResult(new List<BaseEvent>());
+        }
+
     }
 
     /// <inheritdoc/>
-    public Task Publish<T>(T message) where T : BaseEvent
+    public Task<bool> Publish<T>(T message) where T : BaseEvent
     {
-        // TODO: try catch exception like this one
-        // RabbitMQ.Client.Exceptions.BrokerUnreachableException
-
         // Get the body of the message to publish
         var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message));
 
         // Create the connection factory
         var factory = new ConnectionFactory() { Uri = new Uri(mUri) };
 
-        // Create the connection to use to access the RabbitMQ server
-        using var connection = factory.CreateConnection();
+        try
+        {
+            // Create the connection to use to access the RabbitMQ server
+            using var connection = factory.CreateConnection();
 
-        // Create a channel
-        using var channel = connection.CreateModel();
+            // Create a channel
+            using var channel = connection.CreateModel();
 
-        // Declare the queue we are gonna use to publish messages
-        channel.QueueDeclare(mQueueName, true, false, false, null);
+            // Declare the queue we are gonna use to publish messages
+            channel.QueueDeclare(mQueueName, true, false, false, null);
 
-        // Create the basic properties to set for the message to publish
-        var properties = channel.CreateBasicProperties();
+            // Create the basic properties to set for the message to publish
+            var properties = channel.CreateBasicProperties();
 
-        // Get the possibleEvent of the event to publish
-        var type = typeof(T);
+            // Get the type of the event to publish
+            var type = typeof(T);
 
-        // Set the message possibleEvent
-        properties.Type = type.Name;
+            // Set the message type
+            properties.Type = type.Name;
 
-        // Set the id of published message
-        properties.MessageId = Guid.NewGuid().ToString();
+            // Set the id of published message
+            properties.MessageId = Guid.NewGuid().ToString();
 
-        // Set message as persistent
-        properties.Persistent = true;
+            // Set message as persistent
+            properties.Persistent = true;
 
-        // Publish a message
-        channel.BasicPublish("", mQueueName, properties, body);
+            // Publish a message
+            channel.BasicPublish("", mQueueName, properties, body);
+        }
+        catch(BrokerUnreachableException brokerUnreachableException)
+        {
+            // Log it
+            mLogger.LogError(brokerUnreachableException, "Failed to publish a message");
 
-        // Return completed task
-        return Task.CompletedTask;
+            // Return failed
+            return Task.FromResult(false);
+        }
+
+        // Return successful
+        return Task.FromResult(true);
     }
 
     #endregion
