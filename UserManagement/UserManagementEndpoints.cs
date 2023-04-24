@@ -13,7 +13,6 @@ namespace Stayin.Auth;
 /// </summary>
 public class UserManagementEndpoints
 {
-
     #region Public Methods
 
     /// <summary>
@@ -34,6 +33,8 @@ public class UserManagementEndpoints
         // Add user update endpoint
         app.MapPost(ApiRoutes.UpdateUser, instance.UpdateUserHandler);
 
+        // Add retrieve user by id endpoint
+        app.MapGet(ApiRoutes.GetUserById, instance.GetUserById);
     }
 
     /// <summary>
@@ -229,7 +230,25 @@ public class UserManagementEndpoints
         return new() { Errors = result.Errors.Select(x => x.Description).ToList() };
     }
 
+    /// <summary>
+    /// Returns info of a user that has the specified id
+    /// </summary>
+    /// <param name="userId">The id of the user to get details for</param>
+    /// <param name="userManager">The user manager to retrieve the user from the database</param>
+    /// <returns>An <see cref="ApiResponse"/> with the user info in it's body if successful, or errors if failed</returns>
+    public async Task<ApiResponse<UserReadModel>> GetUserById(string userId, UserManager<ApplicationUser> userManager)
+    {
+        // Try get the user using it's id
+        var user = await userManager.FindByIdAsync(userId);
+        
+        // If it doesn't exist
+        if(user is null)
+            // Return an error
+            return new() { Errors = new() { $"The user with id: {userId} does not exit" } };
+
+        // Return the retrieved user
+        return new() { Body = new() { Username = user.UserName, Email = user.Email, PhoneNumber = user.PhoneNumber } };
+    }
+
     #endregion
-
-
 }

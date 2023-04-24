@@ -6,7 +6,6 @@ using System.Security.Claims;
 namespace Stayin.Auth;
 
 
-
 /// <summary>
 /// Handles authorization to different resources in the application
 /// </summary>
@@ -124,6 +123,28 @@ public class AuthorizationEndpoints
 
                 // Otherwise, return an authorized response
                 return (true, AuthAction.AccessDenied);
+            },
+           
+            // Get user details
+            (authRequest, provider) => {
+                // Try match the request path with the get user by id route
+                var pathMatchResult = Match(authRequest.Path, ApiRoutes.GetUserById);
+
+                // If the route does not match
+                if(!pathMatchResult.matched)
+                    // Return false, indicating that we did not handle this request
+                    return Task.FromResult((false, default(AuthAction)));
+
+                // Try authenticate the token and get the user claims
+                var userClaims = AuthenticationHelpers.AuthenticateJwtToken(authRequest.Token, provider.GetRequiredService<IConfiguration>());
+
+                // If the user claims are null, the token is invalid
+                if(userClaims is null)
+                    // Return login action to the caller
+                    return Task.FromResult((true, AuthAction.Login));
+
+                // Otherwise the user is logged in and can access other users info
+                return Task.FromResult((true, AuthAction.Proceed));
             }
         };
     }

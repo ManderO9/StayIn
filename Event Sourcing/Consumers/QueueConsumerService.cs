@@ -33,6 +33,9 @@ public class QueueConsumerService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
 
+        while(true) { await Task.Delay(100000, stoppingToken); }
+
+
         while(!stoppingToken.IsCancellationRequested)
         {
             // Create the scope to get services from

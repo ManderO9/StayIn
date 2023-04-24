@@ -9,14 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // TODO: delete later
 var corsPolicy = "someCorsPolicy";
 builder.Services.AddCors((options) =>
-{
-    options.AddPolicy(corsPolicy,
-        policy =>
-        {
-            policy.WithOrigins("*").WithHeaders("*").WithMethods("*");
-        }
-        );
-});
+    { options.AddPolicy(corsPolicy, policy => { policy.WithOrigins("*").WithHeaders("*").WithMethods("*"); }); });
 
 
 
@@ -69,14 +62,14 @@ app.Map("/create", (IEventBus eventBus) =>
     return (message, otherMessage);
 });
 
-app.Map("/get", async (HttpContext context, IDataAccess db) =>
+app.Map("/get", async (IEventBus eventBus, IDataAccess db) =>
 {
-    return await context.RequestServices.GetRequiredService<IEventBus>().GetNewEvents(db);
+    return await eventBus.GetNewEvents(db);
 });
 
-app.Map("/getall", async (HttpContext context, IDataAccess db) =>
+app.Map("/getall", async (IEventBus eventBus) =>
 {
-    return await context.RequestServices.GetRequiredService<IEventBus>().GetAllEvents();
+    return await eventBus.GetAllEvents();
 });
 
 
