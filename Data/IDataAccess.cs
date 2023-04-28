@@ -18,5 +18,30 @@ public interface IDataAccess
     /// <param name="eventId">The id of the event to add</param>
     /// <returns><see langword="true"/> if the event has not been already consumed,
     /// or <see langword="false"/> if it was already consumed</returns>
+    /// <remarks>
+    ///     Saves the changes automatically to the database
+    /// </remarks>
     public Task<bool> AddToConsumedEventsIfNotAlreadyAsync(string eventId);
+
+    /// <summary>
+    /// Returns a list of all available event ids in the database
+    /// </summary>
+    /// <returns></returns>
+    public Task<List<string>> LoadExistingEventIdsAsync();
+
+    /// <summary>
+    /// Creates a new Event in the datastore
+    /// </summary>
+    /// <param name="newEvent">The event to create</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation</returns>
+    /// <remarks>
+    ///     Changes are not saved in the database until <see cref="SaveChangesAsync"/> is called
+    /// </remarks>
+    public Task CreateEventAsync(BaseEvent newEvent);
+
+    /// <summary>
+    /// Persists the changes in memory to the database
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation</returns>
+    public Task SaveChangesAsync(); 
 }

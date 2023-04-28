@@ -1,6 +1,8 @@
-﻿using RabbitMQ.Client;
+﻿using Microsoft.EntityFrameworkCore;
+using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
 using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 
@@ -58,27 +60,22 @@ public class RabbitMQEventBus : IEventBus
     /// <exception cref="NotImplementedException"></exception>
     private BaseEvent GetEventFromBytes(ReadOnlyMemory<byte> message, string messageType)
     {
-        // TODO: change this to a more elegant way
-        // The list of all events that we handle in our application
-        var availableEvents = new List<(string typeName, Type type)>() {
-            (nameof(UserCreatedEvent), typeof(UserCreatedEvent)),
-            (nameof(UserDeletedEvent), typeof(UserDeletedEvent)),
-            (nameof(UserUpdatedEvent), typeof(UserUpdatedEvent))
-        };
+        // Get the current namespace
+        var namespaceName = typeof(BaseEvent).Namespace;
 
-        // For each event in the available events
-        foreach(var possibleEvent in availableEvents)
+        // Get the type of the message
+        var type = Type.GetType(namespaceName + "." + messageType);
+
+        // If it doesn't exist
+        if(type is null)
         {
-            // If the type of the event matches
-            if(possibleEvent.typeName == messageType)
-
-                // Return a deserialized object of that event
-                return (BaseEvent)JsonSerializer.Deserialize(message.Span, possibleEvent.type)!;
+            // Throw
+            Debugger.Break();
+            throw new NotImplementedException();
         }
 
-        // If we got here, there was an event that we didn't implement or there was an error somewhere
-        Debugger.Break();
-        throw new NotImplementedException();
+        // Return a deserialized object of that event
+        return (BaseEvent)JsonSerializer.Deserialize(message.Span, type)!;
     }
 
     #endregion
@@ -108,6 +105,9 @@ public class RabbitMQEventBus : IEventBus
             // The tag of the last delivered message so we can acknowledge them
             ulong lastDeliveryTag = 0;
 
+            // Load existing event ids from the database
+            var existingEvents = await dataAccess.LoadExistingEventIdsAsync();
+
             // Loop
             do
             {
@@ -117,10 +117,18 @@ public class RabbitMQEventBus : IEventBus
                 // If the message is not null
                 if(message != null)
                 {
-                    // If the event has not been handled yet
-                    if(await dataAccess.AddToConsumedEventsIfNotAlreadyAsync(message.BasicProperties.MessageId))
+                    // If the event has not been already consumed
+                    if(!existingEvents.Any(x => x == message.BasicProperties.MessageId))
+                    {
+                        // Create a new event
+                        var newEvent = GetEventFromBytes(message.Body, message.BasicProperties.Type);
+
                         // Add the message to the list of messages to return
-                        messages.Add(GetEventFromBytes(message.Body, message.BasicProperties.Type));
+                        messages.Add(newEvent);
+
+                        // Add the event to the database
+                        await dataAccess.CreateEventAsync(newEvent);
+                    }
 
                     // Set the current message tag as the last one received
                     lastDeliveryTag = message.DeliveryTag;
@@ -129,16 +137,20 @@ public class RabbitMQEventBus : IEventBus
                 // Until we have a message that is null
             } while(message != null);
 
+            // Save the changes to the database
+            await dataAccess.SaveChangesAsync();
+
             // Acknowledge all the received messages
             channel.BasicNack(lastDeliveryTag, true, true);
 
             // Return the messages
             return messages;
         }
-        catch(BrokerUnreachableException brokerUnreachableException)
+        catch(Exception ex)
+            when(ex is DbUpdateConcurrencyException || ex is DbUpdateException || ex is BrokerUnreachableException)
         {
             // Log it
-            mLogger.LogError(brokerUnreachableException, "Failed to get new events");
+            mLogger.LogError(ex, "Failed to get new events");
 
             // Return empty list
             return new();
@@ -236,7 +248,7 @@ public class RabbitMQEventBus : IEventBus
             properties.Type = type.Name;
 
             // Set the id of published message
-            properties.MessageId = Guid.NewGuid().ToString();
+            properties.MessageId = message.EventId;
 
             // Set message as persistent
             properties.Persistent = true;

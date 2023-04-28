@@ -7,6 +7,8 @@ public class DataAccess : IDataAccess
 {
     // TODO: try locking the database access,
     // cuz it could be used somewhere else during the same time and cause an exception
+    // or maybe not cuz each scope will have his own instance, so no need to lock it
+    // will see
 
 
     #region Private Members
@@ -55,7 +57,18 @@ public class DataAccess : IDataAccess
     }
 
     /// <inheritdoc/>
+    public Task CreateEventAsync(BaseEvent newEvent)
+     => Task.FromResult(mDbContext.ConsumedEvents.Add(newEvent));
+    
+    /// <inheritdoc/>
     public Task<bool> EnsureCreatedAsync() => mDbContext.Database.EnsureCreatedAsync();
+
+    /// <inheritdoc/>
+    public Task<List<string>> LoadExistingEventIdsAsync()
+        => mDbContext.ConsumedEvents.Select(x => x.EventId).ToListAsync();
+
+    /// <inheritdoc/>
+    public Task SaveChangesAsync() => mDbContext.SaveChangesAsync();
 
     #endregion
 }

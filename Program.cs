@@ -48,5 +48,46 @@ app.UseCors(corsPolicy);
 app.Map("/", () => "hello world!");
 
 
+
+// TODO: delete test endpoints
+app.Map("/create", (IEventBus eventBus) =>
+{
+    var message = new UserCreatedEvent()
+    {
+        EventId = Guid.NewGuid().ToString("N"),
+        PublishedTime = DateTimeOffset.UtcNow,
+        UserId = Guid.NewGuid().ToString("N"),
+        Username= "hossem",
+        Email = "hossem@gmail.com",
+        PhoneNumber = "432oz4232975"
+    };
+    eventBus.Publish(message);
+
+    var otherMessage = new UserDeletedEvent()
+    {
+        EventId = Guid.NewGuid().ToString("N"),
+        PublishedTime = DateTimeOffset.UtcNow,
+        UserId = Guid.NewGuid().ToString("N"),
+    };
+    eventBus.Publish(otherMessage);
+
+    return (message, otherMessage);
+});
+
+app.Map("/get", async (IEventBus eventBus, IDataAccess db) =>
+{
+    return await eventBus.GetNewEvents(db);
+});
+
+app.Map("/getall", async (IEventBus eventBus) =>
+{
+    return await eventBus.GetAllEvents();
+});
+
+
+
+
+
+
 // Run the app
 app.Run();
