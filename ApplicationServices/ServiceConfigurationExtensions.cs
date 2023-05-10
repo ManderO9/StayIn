@@ -19,7 +19,7 @@ public static class ServiceConfigurationExtensions
         services.AddDbContext<ApplicationDbContext>(options =>
         {
             // Use SQL server as backend database
-            options.UseSqlServer(configuration.GetConnectionString("Default"));
+            options.UseSqlite(configuration.GetConnectionString("Default"));
         });
 
         // Add data access service

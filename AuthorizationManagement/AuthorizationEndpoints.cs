@@ -121,7 +121,7 @@ public class AuthorizationEndpoints
                     // Return success
                     return (true, AuthAction.Proceed);
 
-                // Otherwise, return an authorized response
+                // Otherwise, return unauthorized response
                 return (true, AuthAction.AccessDenied);
             },
            
