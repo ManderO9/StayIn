@@ -76,6 +76,7 @@ public class UserManagementEndpoints
         var claims = new[]
         {
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
+            new Claim(JwtRegisteredClaimNames.NameId, user.Id),
             new Claim(ClaimTypes.NameIdentifier, user.UserName ?? throw new UnreachableException()),
         };
 
@@ -164,6 +165,7 @@ public class UserManagementEndpoints
         var claims = new[]
         {
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
+            new Claim(JwtRegisteredClaimNames.NameId, user.Id),
             new Claim(ClaimTypes.NameIdentifier, user.UserName ?? throw new UnreachableException()),
         };
 
