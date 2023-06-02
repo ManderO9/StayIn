@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Stayin.Auth;
+namespace Stayin.Core;
 
 /// <summary>
 /// The message between the landlord and the renter

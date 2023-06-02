@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Stayin.Auth;
+namespace Stayin.Core;
 
 /// <summary>
 /// Represents a relationship between a user and a house publication, 

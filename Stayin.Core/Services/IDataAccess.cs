@@ -1,4 +1,4 @@
-﻿namespace Stayin.Auth;
+﻿namespace Stayin.Core;
 
 /// <summary>
 /// Handles all operations related to the database

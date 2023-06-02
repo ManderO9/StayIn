@@ -1,14 +1,16 @@
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
 using Stayin.Auth;
+using Stayin.Core;
+
 
 // Create application builder
 var builder = WebApplication.CreateBuilder(args);
 
-// TODO: delete later
-var corsPolicy = "someCorsPolicy";
-builder.Services.AddCors((options) =>
-    { options.AddPolicy(corsPolicy, policy => { policy.WithOrigins("*").WithHeaders("*").WithMethods("*"); }); });
+//// TODO: delete later
+//var corsPolicy = "someCorsPolicy";
+//builder.Services.AddCors((options) =>
+//    { options.AddPolicy(corsPolicy, policy => { policy.WithOrigins("*").WithHeaders("*").WithMethods("*"); }); });
 
 
 
@@ -44,7 +46,7 @@ if(newlyCreated)
 
 
 // TODO: delete later
-app.UseCors(corsPolicy);
+//app.UseCors(corsPolicy);
 app.Map("/", () => "hello world!");
 
 

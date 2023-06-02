@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Stayin.Auth;
+namespace Stayin.Core;
 
 /// <summary>
 /// An image that is associated to a house publication

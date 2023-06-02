@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text.Json;
+﻿using Stayin.Core;
 
 namespace Stayin.Auth;
 
@@ -56,7 +55,7 @@ public class QueueConsumerService : BackgroundService
                 await newEvent.Handle(db);
 
             // Wait for a period of time before resuming
-            try { await Task.Delay(10 * 1000, stoppingToken); } catch(TaskCanceledException ex) { }
+            try { await Task.Delay(5 * 1000, stoppingToken); } catch(TaskCanceledException ex) { _ = ex; }
         }
     }
 }

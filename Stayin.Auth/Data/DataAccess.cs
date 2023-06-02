@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Stayin.Core;
 
 namespace Stayin.Auth;
 

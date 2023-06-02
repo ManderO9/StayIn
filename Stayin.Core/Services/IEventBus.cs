@@ -1,4 +1,4 @@
-﻿namespace Stayin.Auth;
+﻿namespace Stayin.Core;
 
 /// <summary>
 /// An event bus for publishing and consuming messages

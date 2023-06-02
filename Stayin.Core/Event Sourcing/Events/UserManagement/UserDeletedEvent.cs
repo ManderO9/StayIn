@@ -1,4 +1,4 @@
-﻿namespace Stayin.Auth;
+﻿namespace Stayin.Core;
 
 public class UserDeletedEvent : BaseEvent
 {

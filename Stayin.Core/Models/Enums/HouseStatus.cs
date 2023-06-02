@@ -1,4 +1,4 @@
-﻿namespace Stayin.Auth;
+﻿namespace Stayin.Core;
 
 /// <summary>
 /// The status of a house publication

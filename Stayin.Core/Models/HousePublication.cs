@@ -1,4 +1,4 @@
-﻿namespace Stayin.Auth;
+﻿namespace Stayin.Core;
 
 /// <summary>
 /// Contains information of a house to be rented by other users

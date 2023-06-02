@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
 using System.Diagnostics;
@@ -6,7 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 
-namespace Stayin.Auth;
+namespace Stayin.Core;
 
 /// <summary>
 /// RabbitMQ implementation of an event bus 

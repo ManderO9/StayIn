@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Stayin.Auth;
+namespace Stayin.Core;
 
 /// <summary>
 /// Represents a house rental

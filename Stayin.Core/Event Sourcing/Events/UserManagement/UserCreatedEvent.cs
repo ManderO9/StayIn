@@ -1,31 +1,31 @@
-﻿namespace Stayin.Auth;
+﻿namespace Stayin.Core;
 
 /// <summary>
-/// The event that will get published when a user gets updated
+/// The event that will get published when a user got created
 /// </summary>
-public class UserUpdatedEvent : BaseEvent
+public class UserCreatedEvent : BaseEvent
 {
     #region Public Properties
 
     /// <summary>
-    /// The id of the user
+    /// The id of the created user
     /// </summary>
     public required string UserId { get; set; }
     
     /// <summary>
     /// The username of the user
     /// </summary>
-    public required string NewUsername { get; set; }
+    public required string Username { get; set; }
 
     /// <summary>
     /// The email of the user
     /// </summary>
-    public required string NewEmail { get; set; }
+    public required string Email { get; set; }
 
     /// <summary>
     /// The phone number of the user
     /// </summary>
-    public string? NewPhoneNumber { get; set; }
+    public string? PhoneNumber { get; set; }
     
     #endregion
 

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace Stayin.Auth;
+namespace Stayin.Core;
 
 /// <summary>
 /// The user of our application
