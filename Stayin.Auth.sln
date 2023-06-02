@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stayin.Auth", "Stayin.Auth.csproj", "{13149CAD-8C52-4AAE-9849-9C428ED6EC88}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stayin.Auth", ".\Stayin.Auth\Stayin.Auth.csproj", "{13149CAD-8C52-4AAE-9849-9C428ED6EC88}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
