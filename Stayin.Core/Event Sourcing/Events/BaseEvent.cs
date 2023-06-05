@@ -1,4 +1,6 @@
-﻿namespace Stayin.Core;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Stayin.Core;
 
 /// <summary>
 /// Base event for all events that will be published/consumed by our application
@@ -8,6 +10,7 @@ public class BaseEvent
     /// <summary>
     /// The unique identifier of this event
     /// </summary>
+    [Key]
     public required string EventId { get; set; }
 
     /// <summary>

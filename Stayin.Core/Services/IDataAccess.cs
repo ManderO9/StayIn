@@ -43,5 +43,12 @@ public interface IDataAccess
     /// Persists the changes in memory to the database
     /// </summary>
     /// <returns>A <see cref="Task"/> representing the asynchronous operation</returns>
-    public Task SaveChangesAsync(); 
+    public Task SaveChangesAsync();
+
+
+    public Task AddUserPaymentDetails(PaymentDetails details);
+
+    public Task UpdateUserEmail(string userId, string email);
+
+    public Task DeleteUserDetails(string userId);
 }
