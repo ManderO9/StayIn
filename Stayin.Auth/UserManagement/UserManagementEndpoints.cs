@@ -36,6 +36,9 @@ public class UserManagementEndpoints
 
         // Add retrieve user by id endpoint
         app.MapGet(ApiRoutes.GetUserById, instance.GetUserById);
+
+        // Add get all users endpoint
+        app.MapGet(ApiRoutes.GetAllUsers, instance.GetAllUsers);
     }
 
     /// <summary>
@@ -243,7 +246,7 @@ public class UserManagementEndpoints
     {
         // Try get the user using it's id
         var user = await userManager.FindByIdAsync(userId);
-        
+
         // If it doesn't exist
         if(user is null)
             // Return an error
@@ -252,6 +255,32 @@ public class UserManagementEndpoints
         // Return the retrieved user
         return new() { Body = new() { Username = user.UserName, Email = user.Email, PhoneNumber = user.PhoneNumber } };
     }
+
+    /// <summary>
+    /// Returns list of users available in a specific page
+    /// </summary>
+    /// <param name="page">The page of users to get</param>
+    /// <param name="dataAccess">Data access service</param>
+    /// <returns>List of available users, or an empty list if none available for the passed in page</returns>
+    public async Task<List<UserReadModel>> GetAllUsers([FromRoute] int page, IDataAccess dataAccess)
+    {
+        // Get users from database
+        var users = await dataAccess.GetUsersInPage(page, 15);
+
+        // Map users to user read model and return them
+        return users.Select(x => new UserReadModel()
+        {
+            Email = x.User.Email,
+            PhoneNumber = x.User.PhoneNumber,
+            Username = x.User.UserName,
+            Type = x.Roles.Select(x => x.Name).Aggregate((a, b) => a + "/" + b),
+            PublicationsCount = x.PublicationsCount,
+            ReservationCount = x.ReservationsCount
+        }).ToList();
+    }
+
+
+
 
     #endregion
 }

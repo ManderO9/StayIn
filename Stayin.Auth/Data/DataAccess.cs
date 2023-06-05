@@ -57,10 +57,14 @@ public class DataAccess : IDataAccess
         return true;
     }
 
+    public Task AddUserPaymentDetails(PaymentDetails details) => throw new NotImplementedException();
+    public Task DeleteUserDetails(string userId) => throw new NotImplementedException();
+    public Task UpdateUserEmail(string userId, string email) => throw new NotImplementedException();
+
     /// <inheritdoc/>
     public Task CreateEventAsync(BaseEvent newEvent)
      => Task.FromResult(mDbContext.ConsumedEvents.Add(newEvent));
-    
+
     /// <inheritdoc/>
     public Task<bool> EnsureCreatedAsync() => mDbContext.Database.EnsureCreatedAsync();
 
@@ -70,6 +74,41 @@ public class DataAccess : IDataAccess
 
     /// <inheritdoc/>
     public Task SaveChangesAsync() => mDbContext.SaveChangesAsync();
+
+    /// <inheritdoc/>
+    public async Task<List<(ApplicationUser User, List<ApplicationRole> Roles, int ReservationsCount, int PublicationsCount)>> GetUsersInPage(int page, int size)
+    {
+        // Get the list of users requested
+        var users = await mDbContext.Users.Skip(page * size).Take(size).ToListAsync();
+
+        // Create the list to return
+        var output = new List<(ApplicationUser User, List<ApplicationRole> Roles, int ReservationsCount, int PublicationsCount)>();
+
+        // For each user
+        foreach(var user in users)
+        {
+            // Get the number of reservations created
+            var reservationCount = await mDbContext.Rentals.CountAsync(x => x.RenterId == user.Id);
+
+            // Get the number of house publications created
+            var housePublicationsCount = await mDbContext.HousePublications.CountAsync(x => x.CreatorId == user.Id);
+
+            // Create query to get user roles
+            var rolesQuery = from role in mDbContext.Roles join 
+                             userHasRole in mDbContext.UserRoles on role.Id equals userHasRole.RoleId
+                             where userHasRole.UserId == user.Id select role;
+
+            // Get user roles
+            var roles = await rolesQuery.ToListAsync();
+
+            // Add this entry to the output
+            output.Add((user, roles, reservationCount, housePublicationsCount));
+        }
+
+        // Return the list of users with details
+        return output;
+    }
+
 
     #endregion
 }

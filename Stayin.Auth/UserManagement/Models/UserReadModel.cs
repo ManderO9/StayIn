@@ -19,4 +19,19 @@ public class UserReadModel
     /// The phone number of the user
     /// </summary>
     public string? PhoneNumber { get; set; }
+
+    /// <summary>
+    /// The roles of the user
+    /// </summary>
+    public string? Type { get; set; }
+
+    /// <summary>
+    /// The number of reservations created by this user
+    /// </summary>
+    public int? ReservationCount { get; set; }
+
+    /// <summary>
+    /// The number of publications created by this user
+    /// </summary>
+    public int? PublicationsCount { get; set; }
 }

@@ -45,6 +45,13 @@ public interface IDataAccess
     /// <returns>A <see cref="Task"/> representing the asynchronous operation</returns>
     public Task SaveChangesAsync();
 
+    /// <summary>
+    /// Returns a list of available users in the passed in page and the defined size
+    /// </summary>
+    /// <param name="page">The page to get users from</param>
+    /// <param name="size">The size of the page</param>
+    /// <returns></returns>
+    public Task<List<(ApplicationUser User, List<ApplicationRole> Roles, int ReservationsCount, int PublicationsCount)>> GetUsersInPage(int page, int size);
 
     public Task AddUserPaymentDetails(PaymentDetails details);
 

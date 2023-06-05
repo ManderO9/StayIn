@@ -4,6 +4,10 @@ using Stayin.Auth;
 using Stayin.Core;
 
 
+// TODO: publish events everytime you create/delete/update a user
+// TODO: add a shadow to the navbar in the frontend
+
+
 // Create application builder
 var builder = WebApplication.CreateBuilder(args);
 

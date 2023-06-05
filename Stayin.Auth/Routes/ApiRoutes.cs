@@ -30,9 +30,14 @@ public class ApiRoutes
     /// </summary>
     public const string RequestAuthorization = "/requestAuthorization";
     
+    /// <summary>
+    /// Route to get all available users
+    /// </summary>
+    public const string GetAllUsers = "/users/all/{page}";
+
+
     // TODO: comment this stuff
     public const string DeleteUser = "/users/delete/{userId}";
-    public const string GetAllUsers = "/users/all";
     public const string GetUserByUsername = "/users/byUsername/{username}";
 
 }
