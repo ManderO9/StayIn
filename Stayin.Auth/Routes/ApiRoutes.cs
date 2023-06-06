@@ -35,9 +35,14 @@ public class ApiRoutes
     /// </summary>
     public const string GetAllUsers = "/users/all/{page}";
 
-
-    // TODO: comment this stuff
+    /// <summary>
+    /// Route to delete a user using his id
+    /// </summary>
     public const string DeleteUser = "/users/delete/{userId}";
+
+    /// <summary>
+    /// Route to get user info using his username
+    /// </summary>
     public const string GetUserByUsername = "/users/byUsername/{username}";
 
 }

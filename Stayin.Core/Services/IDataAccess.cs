@@ -53,6 +53,13 @@ public interface IDataAccess
     /// <returns></returns>
     public Task<List<(ApplicationUser User, List<ApplicationRole> Roles, int ReservationsCount, int PublicationsCount)>> GetUsersInPage(int page, int size);
 
+    /// <summary>
+    /// Returns user details using his username
+    /// </summary>
+    /// <param name="username">The username of the user to return</param>
+    /// <returns></returns>
+    public Task<(ApplicationUser? User, List<ApplicationRole>? Roles, int ReservationsCount, int PublicationsCount)> GetUserDetails(string username);
+
     public Task AddUserPaymentDetails(PaymentDetails details);
 
     public Task UpdateUserEmail(string userId, string email);

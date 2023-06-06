@@ -109,6 +109,35 @@ public class DataAccess : IDataAccess
         return output;
     }
 
+    /// <inheritdoc/>
+    public async Task<(ApplicationUser? User, List<ApplicationRole>? Roles, int ReservationsCount, int PublicationsCount)> GetUserDetails(string username)
+    {
+        // Get the user from the users table
+        var user = await mDbContext.Users.FirstOrDefaultAsync(x => username.Equals(x.UserName, StringComparison.OrdinalIgnoreCase));
+
+        // If the user does not exist
+        if(user is null)
+            // Return null for everything
+            return (null, null, 0, 0);
+
+        // Get the number of reservations created
+        var reservationCount = await mDbContext.Rentals.CountAsync(x => x.RenterId == user.Id);
+
+        // Get the number of house publications created
+        var housePublicationsCount = await mDbContext.HousePublications.CountAsync(x => x.CreatorId == user.Id);
+
+        // Create query to get user roles
+        var rolesQuery = from role in mDbContext.Roles
+                         join userHasRole in mDbContext.UserRoles on role.Id equals userHasRole.RoleId
+                         where userHasRole.UserId == user.Id select role;
+
+        // Get user roles
+        var roles = await rolesQuery.ToListAsync();
+
+        // Return user details
+        return (user, roles, reservationCount, housePublicationsCount);
+    }
+
 
     #endregion
 }

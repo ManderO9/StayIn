@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.SqlServer.Server;
 using Stayin.Core;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
@@ -39,6 +41,9 @@ public class UserManagementEndpoints
 
         // Add get all users endpoint
         app.MapGet(ApiRoutes.GetAllUsers, instance.GetAllUsers);
+
+        // Add delete user endpoint
+        app.MapGet(ApiRoutes.DeleteUser, instance.DeleteUserById);
     }
 
     /// <summary>
@@ -279,7 +284,72 @@ public class UserManagementEndpoints
         }).ToList();
     }
 
+    /// <summary>
+    /// Deletes a user from the backing store using it's id
+    /// </summary>
+    /// <param name="userId">The id of the user to delete</param>
+    /// <param name="userManager">User manager to manager users</param>
+    /// <returns>An <see cref="ApiResponse"/>Containing a list of errors if failed, or none if successful</returns>
+    public async Task<ApiResponse> DeleteUserById([FromRoute] string userId, UserManager<ApplicationUser> userManager)
+    {
+        // If user id is empty
+        if(string.IsNullOrEmpty(userId))
 
+            // Return an error
+            return new ApiResponse() { Errors = new List<string> { "User id can't be empty" } };
+
+        // Get the user to delete
+        var user = await userManager.FindByIdAsync(userId);
+
+        // If we have no user
+        if(user is null)
+            // Return an error
+            return new ApiResponse() { Errors = new List<string> { $"User with id:'{userId}' does not exist" } };
+
+
+        // Delete the user
+        var result = await userManager.DeleteAsync(user);
+
+        // If successful
+        if(result.Succeeded)
+
+            // Return success response
+            return new ApiResponse();
+
+        // Otherwise, return an error
+        return new ApiResponse() { Errors = result.Errors.Select(x => x.Description).ToList() };
+    }
+
+    /// <summary>
+    /// Returns user details using his username, or null if the user does not exist
+    /// </summary>
+    /// <param name="username">The username of the user to return the details for</param>
+    /// <param name="dataAccess">Data access service</param>
+    /// <returns></returns>
+    public async Task<UserReadModel?> GetUserByUsername([FromRoute] string username, IDataAccess dataAccess)
+    {
+        // Get user details from database
+        var userDetails = await dataAccess.GetUserDetails(username);
+
+        // If we got no user
+        if(userDetails.User is null)
+            // Return null
+            return null;
+
+        // Map user details to user read model 
+        var output = new UserReadModel()
+        {
+            Email = userDetails.User.Email,
+            PhoneNumber = userDetails.User.PhoneNumber,
+            Username = userDetails.User.UserName,
+            Type = userDetails.Roles?.Select(x => x.Name).Aggregate((a, b) => a + "/" + b),
+            PublicationsCount = userDetails.PublicationsCount,
+            ReservationCount = userDetails.ReservationsCount
+        };
+
+        // Return the user details
+        return output;
+    }
 
 
     #endregion
