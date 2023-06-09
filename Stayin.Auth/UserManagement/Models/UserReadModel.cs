@@ -44,4 +44,9 @@ public class UserReadModel
     /// The id of the profile image for this user
     /// </summary>
     public string? ProfileImageId { get; set; }
+
+    /// <summary>
+    /// The description the user gave to his profile
+    /// </summary>
+    public string? Description { get; set; }
 }

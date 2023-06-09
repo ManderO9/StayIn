@@ -45,4 +45,14 @@ public class ApiRoutes
     /// </summary>
     public const string GetUserByUsername = "/users/byUsername/{username}";
 
+    /// <summary>
+    /// Route to get reservation infos for a specific user
+    /// </summary>
+    public const string GetReservationsForUser = "/reservations/byUserId/{userId}";
+    
+    /// <summary>
+    /// Route to get house publications created by the specified user
+    /// </summary>
+    public const string GetPublicationsForUser = "/publications/byUserId/{userId}";
+
 }

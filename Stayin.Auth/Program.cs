@@ -1,25 +1,17 @@
-using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Stayin.Auth;
 using Stayin.Core;
 
 
 // TODO: publish events everytime you create/delete/update a user
-// TODO: add a shadow to the navbar in the frontend
 
 
 // Create application builder
 var builder = WebApplication.CreateBuilder(args);
 
-//// TODO: delete later
-//var corsPolicy = "someCorsPolicy";
-//builder.Services.AddCors((options) =>
-//    { options.AddPolicy(corsPolicy, policy => { policy.WithOrigins("*").WithHeaders("*").WithMethods("*"); }); });
-
-
-
 // Remove the default camel case naming convention for properties
-builder.Services.Configure<JsonOptions>(config =>
+builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(config =>
 {
     config.SerializerOptions.PropertyNamingPolicy = null;
 });
@@ -49,51 +41,13 @@ if(newlyCreated)
 }
 
 
-// TODO: delete later
-//app.UseCors(corsPolicy);
-app.Map("/", () => "hello world!");
+app.Map("/", () => "Hello from Auth microservice");
 
+app.MapGet(ApiRoutes.GetReservationsForUser, ([FromRoute] string userId, ApplicationDbContext db)
+    => db.Rentals.Where(x => x.RenterId == userId));
 
-
-// TODO: delete test endpoints
-app.Map("/create", (IEventBus eventBus) =>
-{
-    var message = new UserCreatedEvent()
-    {
-        EventId = Guid.NewGuid().ToString("N"),
-        PublishedTime = DateTimeOffset.UtcNow,
-        UserId = Guid.NewGuid().ToString("N"),
-        Username= "hossem",
-        Email = "hossem@gmail.com",
-        PhoneNumber = "432oz4232975"
-    };
-    eventBus.Publish(message);
-
-    var otherMessage = new UserDeletedEvent()
-    {
-        EventId = Guid.NewGuid().ToString("N"),
-        PublishedTime = DateTimeOffset.UtcNow,
-        UserId = Guid.NewGuid().ToString("N"),
-    };
-    eventBus.Publish(otherMessage);
-
-    return (message, otherMessage);
-});
-
-app.Map("/get", async (IEventBus eventBus, IDataAccess db) =>
-{
-    return await eventBus.GetNewEvents(db);
-});
-
-app.Map("/getall", async (IEventBus eventBus) =>
-{
-    return await eventBus.GetAllEvents();
-});
-
-
-
-
-
+app.MapGet(ApiRoutes.GetPublicationsForUser, ([FromRoute] string userId, ApplicationDbContext db)
+    => db.HousePublications.Where(x => x.CreatorId == userId));
 
 // Run the app
 app.Run();

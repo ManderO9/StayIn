@@ -32,6 +32,7 @@ public class QueueConsumerService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
 
+        // TODO: delete this when running in production
         while(true) { await Task.Delay(100000, stoppingToken); }
 
 

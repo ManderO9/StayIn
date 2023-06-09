@@ -65,4 +65,11 @@ public interface IDataAccess
     public Task UpdateUserEmail(string userId, string email);
 
     public Task DeleteUserDetails(string userId);
+
+    public Task AddRentalAsync(Rental rental);
+
+    public Task CreateHousePublicationAsync(HousePublication housePublication);
+
+    public Task<HousePublication?> GetHousePublicationById(string id);
+    
 }

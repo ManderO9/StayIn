@@ -138,6 +138,13 @@ public class DataAccess : IDataAccess
         return (user, roles, reservationCount, housePublicationsCount);
     }
 
+    public Task AddRentalAsync(Rental rental) =>Task.FromResult(mDbContext.Rentals.Add(rental));
+    public Task CreateHousePublicationAsync(HousePublication housePublication) 
+        => Task.FromResult(mDbContext.HousePublications.Add(housePublication));
+
+    public async Task<HousePublication?> GetHousePublicationById(string id) 
+        => await mDbContext.HousePublications.FirstOrDefaultAsync(x=>x.Id == id);
+
 
     #endregion
 }

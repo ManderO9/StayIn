@@ -70,9 +70,8 @@ public class RabbitMQEventBus : IEventBus
         // If it doesn't exist
         if(type is null)
         {
-            // Throw
-            Debugger.Break();
-            throw new NotImplementedException();
+            // Ignore it
+            return JsonSerializer.Deserialize<NullEvent>(message.Span)!;
         }
 
         // Return a deserialized object of that event

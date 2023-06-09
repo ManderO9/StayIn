@@ -20,4 +20,15 @@ public class HousePublication
     /// </summary>
     public required HouseStatus Status { get; set; }
 
+    /// <summary>
+    /// The title of the house publication
+    /// </summary>
+    public string? Title { get; set; }
+
+    /// <summary>
+    /// The description of the house publication
+    /// </summary>
+    public string? Description { get; set; }
+
+
 }

@@ -204,7 +204,7 @@ public class UserManagementEndpoints
     /// <param name="userId">The id of the user to update</param>
     /// <param name="userManager">The user manager to handle user updating</param>
     /// <returns>An <see cref="ApiResponse"/> with the new user info in it's body if successful, or errors if failed</returns>
-    public async Task<ApiResponse<UserUpdateModel>> UpdateUserHandler([FromBody] UserUpdateModel userInfo, string userId, UserManager<ApplicationUser> userManager)
+    public async Task<ApiResponse<UserReadModel>> UpdateUserHandler([FromBody] UserUpdateModel userInfo, string userId, UserManager<ApplicationUser> userManager)
     {
         // Try get the user using it's id
         var user = await userManager.FindByIdAsync(userId);
@@ -245,7 +245,7 @@ public class UserManagementEndpoints
         // If the update was successful
         if(result.Succeeded)
             // Return a success response containing the user
-            return new() { Body = userInfo };
+            return new() { Body = new UserReadModel() { Username = user.UserName, Email = user.Email, PhoneNumber = user.PhoneNumber, Id = user.Id, ProfileImageId = user.ProfileImageId, Description = user.Description } };
 
         // Otherwise, return an error
         return new() { Errors = result.Errors.Select(x => x.Description).ToList() };
@@ -268,7 +268,7 @@ public class UserManagementEndpoints
             return new() { Errors = new() { $"The user with id: {userId} does not exit" } };
 
         // Return the retrieved user
-        return new() { Body = new() { Username = user.UserName, Email = user.Email, PhoneNumber = user.PhoneNumber, Id = user.Id, ProfileImageId = user.ProfileImageId } };
+        return new() { Body = new() { Username = user.UserName, Email = user.Email, PhoneNumber = user.PhoneNumber, Id = user.Id, ProfileImageId = user.ProfileImageId , Description = user.Description} };
     }
 
     /// <summary>
@@ -291,7 +291,9 @@ public class UserManagementEndpoints
             Type = x.Roles.Select(x => x.Name).Aggregate((a, b) => a + "/" + b),
             PublicationsCount = x.PublicationsCount,
             ReservationCount = x.ReservationsCount,
-            Id = x.User.Id
+            Id = x.User.Id,
+            ProfileImageId = x.User.ProfileImageId,
+            Description = x.User.Description
         }).ToList();
     }
 
@@ -356,7 +358,9 @@ public class UserManagementEndpoints
             Type = userDetails.Roles?.Select(x => x.Name).Aggregate((a, b) => a + "/" + b),
             PublicationsCount = userDetails.PublicationsCount,
             ReservationCount = userDetails.ReservationsCount,
-            Id = userDetails.User.Id
+            Id = userDetails.User.Id,
+            Description = userDetails.User.Description,
+            ProfileImageId= userDetails.User.ProfileImageId
         };
 
         // Return the user details
