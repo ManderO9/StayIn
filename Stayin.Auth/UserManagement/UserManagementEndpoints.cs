@@ -229,6 +229,16 @@ public class UserManagementEndpoints
             // Update it
             user.Email = userInfo.Email;
 
+        // If the description is not empty
+        if(!string.IsNullOrEmpty(userInfo.Description))
+            // Update it
+            user.Description = userInfo.Description;
+
+        // If the image id is not empty
+        if(!string.IsNullOrEmpty(userInfo.ProfileImageId))
+            // Update it
+            user.ProfileImageId = userInfo.ProfileImageId;
+
         // Try save the changes 
         var result = await userManager.UpdateAsync(user);
 
@@ -258,7 +268,7 @@ public class UserManagementEndpoints
             return new() { Errors = new() { $"The user with id: {userId} does not exit" } };
 
         // Return the retrieved user
-        return new() { Body = new() { Username = user.UserName, Email = user.Email, PhoneNumber = user.PhoneNumber } };
+        return new() { Body = new() { Username = user.UserName, Email = user.Email, PhoneNumber = user.PhoneNumber, Id = user.Id, ProfileImageId = user.ProfileImageId } };
     }
 
     /// <summary>
@@ -280,7 +290,8 @@ public class UserManagementEndpoints
             Username = x.User.UserName,
             Type = x.Roles.Select(x => x.Name).Aggregate((a, b) => a + "/" + b),
             PublicationsCount = x.PublicationsCount,
-            ReservationCount = x.ReservationsCount
+            ReservationCount = x.ReservationsCount,
+            Id = x.User.Id
         }).ToList();
     }
 
@@ -344,7 +355,8 @@ public class UserManagementEndpoints
             Username = userDetails.User.UserName,
             Type = userDetails.Roles?.Select(x => x.Name).Aggregate((a, b) => a + "/" + b),
             PublicationsCount = userDetails.PublicationsCount,
-            ReservationCount = userDetails.ReservationsCount
+            ReservationCount = userDetails.ReservationsCount,
+            Id = userDetails.User.Id
         };
 
         // Return the user details

@@ -6,6 +6,11 @@
 public class UserReadModel
 {
     /// <summary>
+    /// The id of the user
+    /// </summary>
+    public required string Id { get; set; }
+    
+    /// <summary>
     /// The username of the user
     /// </summary>
     public string? Username { get; set; }
@@ -34,4 +39,9 @@ public class UserReadModel
     /// The number of publications created by this user
     /// </summary>
     public int? PublicationsCount { get; set; }
+
+    /// <summary>
+    /// The id of the profile image for this user
+    /// </summary>
+    public string? ProfileImageId { get; set; }
 }

@@ -20,4 +20,13 @@ public class UserUpdateModel
     /// </summary>
     public string? PhoneNumber { get; set; }
 
+    /// <summary>
+    /// The description a user gives about himself
+    /// </summary>
+    public string? Description { get; set; }
+
+    /// <summary>
+    /// The id of the profile image for this user
+    /// </summary>
+    public string? ProfileImageId { get; set; }
 }
