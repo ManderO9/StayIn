@@ -163,21 +163,6 @@ public class AuthorizationEndpoints
         // Create a new instance of the current class
         var instance = new AuthorizationEndpoints();
 
-        // TODO: delete later, this is just for testing
-        app.MapGet("/auth", (string? token, IConfiguration configuration) =>
-        {
-            // Try authenticate the token and get the user claims
-            var userClaims = AuthenticationHelpers.AuthenticateJwtToken(token, configuration);
-
-            // If the user claims are not null, the token is valid
-            if(userClaims is not null)
-            {
-                return "user is valid, his name is: " + instance.Username(userClaims);
-            }
-
-            return "invalid token";
-        });
-
         // Handle authorization requests
         app.MapPost(ApiRoutes.RequestAuthorization, instance.HandleAuthRequest);
     }
