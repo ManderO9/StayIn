@@ -25,7 +25,7 @@ public class AppartementCreatedEvent : BaseEvent
     public string? extraInfo { get; set; }
     public string? checkIn { get; set; }
     public string? checkOut { get; set; }
-    public int maxGuests { get; set; }
-    public int price { get; set; }
+    //public string? maxGuests { get; set; }
+    public string? price { get; set; }
     public string?[]? reservedDates { get; set; }
 }

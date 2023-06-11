@@ -33,7 +33,7 @@ public class QueueConsumerService : BackgroundService
     {
 
         // TODO: delete this when running in production
-        while(true) { await Task.Delay(100000, stoppingToken); }
+        //while(true) { await Task.Delay(100000, stoppingToken); }
 
 
         while(!stoppingToken.IsCancellationRequested)
