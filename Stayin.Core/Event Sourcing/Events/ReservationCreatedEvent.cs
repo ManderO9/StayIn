@@ -24,10 +24,10 @@ public class ReservationCreatedEvent : BaseEvent
     public required string user { get; set; }
     public string? checkIn { get; set; }
     public string? checkOut { get; set; }
-    public int numberOfGuests { get; set; }
+    //public dynamic? numberOfGuests { get; set; }
     public string? name { get; set; }
     public string? phone { get; set; }
     public string? email { get; set; }
-    public double price { get; set; }
+    public int price { get; set; }
     public string?[]? reservedDates { get; set; }
 }
